@@ -1,22 +1,24 @@
 import 'dotenv/config';
+import mongoose from 'mongoose';
 import express, { Request, Response } from 'express';
-import mongoose, { Schema, model } from 'mongoose';
+// import mongoose, { Schema, model } from 'mongoose';
+import { Employee } from './models/employee.model.js'; //importamos el modelo que modularizamos y lo movimos a models/employee.models.js
 
 const app = express();
 app.use(express.json());
 
-const employeeSchema = new Schema(
-  {
-    name: { type: String, required: true },
-    position: { type: String, required: true },
-    baseSalary: { type: Number, required: true },
-    yearsOfService: { type: Number, required: true },
-    finalSalary: { type: Number, required: true }
-  },
-  { timestamps: true }
-);
+// const employeeSchema = new Schema(   //la creacion del esquema lo movemos a la carpeta de models
+//   {
+//     name: { type: String, required: true },
+//     position: { type: String, required: true },
+//     baseSalary: { type: Number, required: true },
+//     yearsOfService: { type: Number, required: true },
+//     finalSalary: { type: Number, required: true }
+//   },
+//   { timestamps: true }
+// );
 
-const Employee = model('Employee', employeeSchema);
+// const Employee = model('Employee', employeeSchema);
 
 app.post('/employees', async (req: Request, res: Response) => {
   try {
