@@ -2,7 +2,8 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import express, { Request, Response } from 'express';
 // import mongoose, { Schema, model } from 'mongoose';
-import { Employee } from './models/employee.model.js'; //importamos el modelo que modularizamos y lo movimos a models/employee.models.js
+import { EmployeeRoutes } from './routes/employee.routes.js'; //importamos las rutas ya armadas con controller, service y repository inyectados
+// import { Employee } from './models/employee.model.js'; //ya no hace falta, server.ts no habla directo con el modelo
 
 const app = express();
 app.use(express.json());
@@ -20,69 +21,71 @@ app.use(express.json());
 
 // const Employee = model('Employee', employeeSchema);
 
-app.post('/employees', async (req: Request, res: Response) => {
-  try {
-    const { name, position, baseSalary, yearsOfService } = req.body;
+// app.post('/employees', async (req: Request, res: Response) => {   //toda esta logica se movio a service y controller
+//   try {
+//     const { name, position, baseSalary, yearsOfService } = req.body;
 
-    if (!name || !position) {
-      return res.status(400).json({ message: 'Nombre y puesto son obligatorios' });
-    }
+//     if (!name || !position) {
+//       return res.status(400).json({ message: 'Nombre y puesto son obligatorios' });
+//     }
 
-    if (typeof baseSalary !== 'number' || baseSalary <= 0) {
-      return res.status(400).json({ message: 'El salario base debe ser mayor a 0' });
-    }
+//     if (typeof baseSalary !== 'number' || baseSalary <= 0) {
+//       return res.status(400).json({ message: 'El salario base debe ser mayor a 0' });
+//     }
 
-    if (
-      typeof yearsOfService !== 'number' ||
-      yearsOfService < 0 ||
-      !Number.isInteger(yearsOfService)
-    ) {
-      return res.status(400).json({ message: 'La antigüedad debe ser un entero mayor o igual a 0' });
-    }
+//     if (
+//       typeof yearsOfService !== 'number' ||
+//       yearsOfService < 0 ||
+//       !Number.isInteger(yearsOfService)
+//     ) {
+//       return res.status(400).json({ message: 'La antigüedad debe ser un entero mayor o igual a 0' });
+//     }
 
-    const bonus = baseSalary * 0.02 * yearsOfService;
-    const finalSalary = baseSalary + bonus;
+//     const bonus = baseSalary * 0.02 * yearsOfService;
+//     const finalSalary = baseSalary + bonus;
 
-    const employee = await Employee.create({
-      name,
-      position,
-      baseSalary,
-      yearsOfService,
-      finalSalary
-    });
+//     const employee = await Employee.create({
+//       name,
+//       position,
+//       baseSalary,
+//       yearsOfService,
+//       finalSalary
+//     });
 
-    console.log(`Empleado creado: ${employee.name} - salario final: ${employee.finalSalary}`);
-    return res.status(201).json(employee);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Error interno del servidor' });
-  }
-});
+//     console.log(`Empleado creado: ${employee.name} - salario final: ${employee.finalSalary}`);
+//     return res.status(201).json(employee);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Error interno del servidor' });
+//   }
+// });
 
-app.get('/employees', async (_req: Request, res: Response) => {
-  try {
-    const employees = await Employee.find().sort({ createdAt: -1 });
-    return res.json(employees);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Error interno del servidor' });
-  }
-});
+// app.get('/employees', async (_req: Request, res: Response) => {
+//   try {
+//     const employees = await Employee.find().sort({ createdAt: -1 });
+//     return res.json(employees);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Error interno del servidor' });
+//   }
+// });
 
-app.get('/employees/:id', async (req: Request, res: Response) => {
-  try {
-    const employee = await Employee.findById(req.params.id);
+// app.get('/employees/:id', async (req: Request, res: Response) => {
+//   try {
+//     const employee = await Employee.findById(req.params.id);
 
-    if (!employee) {
-      return res.status(404).json({ message: 'Empleado no encontrado' });
-    }
+//     if (!employee) {
+//       return res.status(404).json({ message: 'Empleado no encontrado' });
+//     }
 
-    return res.json(employee);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Error interno del servidor' });
-  }
-});
+//     return res.json(employee);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Error interno del servidor' });
+//   }
+// });
+
+app.use(EmployeeRoutes.routes); //aca se montan las 3 rutas de arriba, ya con controller, service, repository, model ese es el flujo
 
 const PORT = Number(process.env.PORT ?? 3000);
 const MONGO_URI = process.env.MONGO_URI ?? 'mongodb://localhost:27017/employees_db';
